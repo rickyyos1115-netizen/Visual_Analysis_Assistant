@@ -89,7 +89,7 @@ def groq_analyze_image(image, prompt):
     except Exception as e:
         return f"Groq API 錯誤: {str(e)}"
 
-st.title("Ollama-Groq視覺分析助手")
+st.title("Groq視覺分析助手")
 
 api_choice = st.radio("選擇 API:", ["Groq"], horizontal=True)
 
