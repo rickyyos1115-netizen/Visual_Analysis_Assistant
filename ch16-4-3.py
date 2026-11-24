@@ -1,16 +1,16 @@
 import streamlit as st
-import ollama
-from ollama import Client
+# import ollama
+# from ollama import Client
 from groq import Groq
 from PIL import Image, ImageOps
 import base64
 import io
-import os
+# import os
 
-client = Client(
-    host="https://ollama.com",
-    headers={'Authorization': 'Bearer ' + os.environ.get('OLLAMA_API_KEY')}
-)
+# client = Client(
+#     host="https://ollama.com",
+#     headers={'Authorization': 'Bearer ' + os.environ.get('OLLAMA_API_KEY')}
+# )
 
 def encode_image(image: Image.Image) -> str:
     """將圖片轉換為 Base64（保證為RGB，避免JPEG儲存失敗）"""
@@ -23,40 +23,40 @@ def encode_image(image: Image.Image) -> str:
     image.save(buffered, format="JPEG")
     return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-def ollama_cloud_analyze_image(image, prompt):
-    """使用 Ollama API 分析圖片"""
-    try: 
-        base64_image = encode_image(image)        
-        response = client.chat(
-            model='gemma4:31b-cloud',  # 指定您要使用的雲端模型
-            messages=[
-                {
-                    'role': 'user',
-                    'content': prompt,
-                    'images': [base64_image]  # Ollama 支援直接傳入檔案路徑
-                }
-            ],
-        )
-        return response["message"]["content"].strip()
-    except Exception as e:
-        return f"Ollama API 錯誤: {str(e)}"
+# def ollama_cloud_analyze_image(image, prompt):
+#     """使用 Ollama API 分析圖片"""
+#     try: 
+#         base64_image = encode_image(image)        
+#         response = client.chat(
+#             model='gemma4:31b-cloud',  # 指定您要使用的雲端模型
+#             messages=[
+#                 {
+#                     'role': 'user',
+#                     'content': prompt,
+#                     'images': [base64_image]  # Ollama 支援直接傳入檔案路徑
+#                 }
+#             ],
+#         )
+#         return response["message"]["content"].strip()
+#     except Exception as e:
+#         return f"Ollama API 錯誤: {str(e)}"
 
-def ollama_analyze_image(image, prompt):
-    """使用 Ollama API 分析圖片"""
-    try:
-        base64_image = encode_image(image)
-        response = ollama.chat(
-            model="gemma4:12b",  # llava:13b
-            messages=[{
-                "role": "user",
-                "content": prompt,
-                "images": [base64_image],
-            }]
-        )
-        # 依 Ollama Python SDK，回傳物件結構如下
-        return response["message"]["content"].strip()
-    except Exception as e:
-        return f"Ollama API 錯誤: {str(e)}"
+# def ollama_analyze_image(image, prompt):
+#     """使用 Ollama API 分析圖片"""
+#     try:
+#         base64_image = encode_image(image)
+#         response = ollama.chat(
+#             model="gemma4:12b",  # llava:13b
+#             messages=[{
+#                 "role": "user",
+#                 "content": prompt,
+#                 "images": [base64_image],
+#             }]
+#         )
+#         # 依 Ollama Python SDK，回傳物件結構如下
+#         return response["message"]["content"].strip()
+#     except Exception as e:
+#         return f"Ollama API 錯誤: {str(e)}"
 
 def groq_analyze_image(image, prompt):
     """使用 Groq API 分析圖片"""
@@ -89,9 +89,9 @@ def groq_analyze_image(image, prompt):
     except Exception as e:
         return f"Groq API 錯誤: {str(e)}"
 
-st.title("Ollama-Groq視覺分析助手")
+st.title("Groq視覺分析助手")
 
-api_choice = st.radio("選擇 API:", ["Ollama", "Ollama-Cloud", "Groq"], horizontal=True)
+api_choice = st.radio("選擇 API:", ["Groq"], horizontal=True)
 
 uploaded_file = st.file_uploader(
     "上傳圖檔",
@@ -113,12 +113,7 @@ if st.button("分析影像"):
         col1.image(image, caption="已上傳的圖檔")
 
         with st.spinner(f"使用 {api_choice} API 分析中..."):
-            if api_choice == "Ollama":
-                result = ollama_analyze_image(image, prompt)  
-            elif api_choice == "Ollama-Cloud":
-                result = ollama_cloud_analyze_image(image, prompt)
-            else:
-                result = groq_analyze_image(image, prompt)
+            result = groq_analyze_image(image, prompt)
 
         st.success("影像分析完成!")
         col2.write(result)
